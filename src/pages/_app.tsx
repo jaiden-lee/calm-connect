@@ -8,29 +8,28 @@ import { useRouter } from "next/router";
 import Navbar from "@/components/Navbar";
 import { AppProvider, NotificationsProvider } from "@toolpad/core";
 import { inter } from "@/utils/fonts";
-import { createTheme } from '@mui/material/styles';
+import { createTheme } from "@mui/material/styles";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 const lightTheme = createTheme({
   palette: {
-    mode: 'light',
+    mode: "light",
     info: {
-      main: "#D5D5D5"
-    }
+      main: "#D5D5D5",
+    },
   },
   colorSchemes: {
-    dark: false
+    dark: false,
   },
   components: {
     MuiTextField: {
       styleOverrides: {
-        root: {
-
-        }
-      }
-    }
-  }
+        root: {},
+      },
+    },
+  },
 });
-
 
 export default function App({ Component, pageProps }: AppProps) {
   const supabase = createClient();
@@ -43,7 +42,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const setUserAndCheckForRedirect = (newUserData: User | null | undefined) => {
     setUser(newUserData);
     async function redirectToCreation() {
-      if (!newUserData) return
+      if (!newUserData) return;
       const { data, error } = await supabase
         .from("clinics")
         .select("id")
@@ -112,14 +111,16 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <AppProvider theme={lightTheme}>
-      <NotificationsProvider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <NotificationsProvider>
           <UserContext.Provider value={user}>
             <div className={`${inter.className} min-h-full`}>
               <Navbar />
               <Component {...pageProps} />
             </div>
           </UserContext.Provider>
-      </NotificationsProvider>
+        </NotificationsProvider>
+      </LocalizationProvider>
     </AppProvider>
   );
 }

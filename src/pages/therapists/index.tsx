@@ -187,11 +187,25 @@ export default function Therapists({
                     </Grid>
                   </Grid>
                   <Container className="flex gap-4">
-                    <Link href={"/therapist/" + therapist.id} className="mt-2 text-primary-blue  hover:underline">View Bookings</Link>
-                    <TherapistProfile name={therapist.name} bio={therapist.bio} ethnicity={therapist.ethnicity} gender={therapist.gender} specialization={therapist.specialization} ageRange={therapist.ageRange} age={therapist.age} />
+                    <Link
+                      href={"/therapists/" + therapist.id}
+                      className="mt-2 text-primary-blue  hover:underline"
+                    >
+                      View Bookings
+                    </Link>
+                    <TherapistProfile
+                      name={therapist.name}
+                      bio={therapist.bio}
+                      ethnicity={therapist.ethnicity}
+                      gender={therapist.gender}
+                      specialization={therapist.specialization}
+                      ageRange={therapist.ageRange}
+                      age={therapist.age}
+                    />
                   </Container>
                 </div>
-                <Divider key={therapist.id + "d"}
+                <Divider
+                  key={therapist.id + "d"}
                   aria-hidden="true"
                   className="my-4 h-0"
                 />
@@ -245,7 +259,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-  
   return {
     props: {
       therapists: therapistRes.data,
