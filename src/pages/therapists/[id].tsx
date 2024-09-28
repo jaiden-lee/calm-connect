@@ -3,6 +3,7 @@ import { useState } from "react";
 import PatientCard from "@/components/PatientCard";
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
+import timeGridPlugin from "@fullcalendar/timegrid";
 import { GetServerSidePropsContext } from "next";
 import { createClient } from "@/utils/supabase/server-props";
 import { stringOrFirstString } from "@/utils/helper";
@@ -79,12 +80,32 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 function Dashboard(props: PageProps) {
     const [filter, setFilter] = useState<FilterType>("All");
-    const [events, setEvents] = useState(() => {
-        return props.appointments.map((appointment) => {
-            return {title: appointment.name, date: appointment.created_at}
-        })
+    // const [pendingEvents, setPendingEvents] = useState(() => {
+    //     return props.appointments.filter((appointment) => {
+    //         if (appointment.is_pending) {
+    //             return {title: appointment.name, date: appointment.created_at}
+    //         }
+    //     })
+    // });
+    const [pendingEvents, setPendingEvents] = useState([{title: "Gerald Ford", start: new Date(), end: new Date(Date.now() + 3600*1000), displayEventEnd: true}]);
+    const [acceptedEvents, setAcceptedEvents] = useState([{title: "Gerald Ford", start: new Date(Date.now() - 24*3600*1000), end: new Date(Date.now() - 23*3600*1000), displayEventEnd: true}]);
+    const [appointmentSlots, setAppointmentSlots] = useState([{title: "", start: new Date(Date.now() - 5*3600*1000), end: new Date(Date.now() + 5*3600*1000)}]);
+    const [daysOff, setDaysOff] = useState([{title: "Day Off", date: new Date(Date.now() - 48*3600*1000), allDay: true}]);
+
+    const filteredAppointments = props.appointments.filter((appointment) => {
+        if (filter === "Pending") {
+            if (appointment.is_pending) {
+                return appointment;
+            }
+        } else if (filter === "Accepted") {
+            if (!appointment.is_pending) {
+                return appointment;
+            }
+        } else {
+            return appointment;
+        }
     });
-    const cards = props.appointments.map((appointment) => {
+    const cards = filteredAppointments.map((appointment) => {
         return <PatientCard key={appointment.id} id={appointment.id} date={appointment.created_at} patientName={appointment.name} description={appointment.description}/>
     });
     
@@ -93,6 +114,7 @@ function Dashboard(props: PageProps) {
             setFilter(newFilter);
         }
     }
+    console.log(new Date(Date.now() + 3600*1000));
 
 
     return (
@@ -102,13 +124,42 @@ function Dashboard(props: PageProps) {
                 {/* Calendar */}
                 <div className="w-[50%] flex flex-col gap-4">
                     <FullCalendar
-                        plugins={[ dayGridPlugin ]}
-                        initialView="dayGridWeek"
+                        nowIndicator={true}
+                        eventOverlap={true}
+                        scrollTime="current"
+                        plugins={[ dayGridPlugin, timeGridPlugin ]}
+                        initialView="timeGridWeek"
                         headerToolbar = {{
                             left: 'prev,next',
                             center: 'title',
-                            right: 'dayGridWeek,dayGridMonth' // user can switch between the two
+                            right: 'timeGridDay,timeGridWeek,dayGridMonth' // user can switch between the two
                         }}
+                        eventSources={[
+                            {
+                                events: daysOff,
+                                backgroundColor: "red",
+                                display: "block",
+                                borderColor: "transparent",
+                            },
+                            {
+                                events: appointmentSlots,
+                                backgroundColor: "green",
+                                display: "block",
+                                borderColor: "transparent",
+                            },
+                            {
+                                events: pendingEvents,
+                                backgroundColor: "#C5C5C5",
+                                display: "block",
+                                borderColor: "transparent",
+                            },
+                            {
+                                events: acceptedEvents,
+                                backgroundColor: "#2196F3",
+                                display: "block",
+                                borderColor: "transparent",
+                            }
+                        ]}
                     />
                     <div className="flex gap-4">
                         <Button size="large" className="button-primary px-4">Add Availabilities</Button>
