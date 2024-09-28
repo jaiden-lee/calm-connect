@@ -7,6 +7,13 @@ import { UserContext } from "@/utils/context";
 import { useRouter } from "next/router";
 import Navbar from "@/components/Navbar";
 import { AppProvider, NotificationsProvider } from "@toolpad/core";
+import { createTheme, ThemeProvider } from "@mui/material";
+
+const lightTheme = createTheme({
+  palette: {
+    mode: "light",
+  },
+});
 
 export default function App({ Component, pageProps }: AppProps) {
   const supabase = createClient();
@@ -19,10 +26,11 @@ export default function App({ Component, pageProps }: AppProps) {
   const setUserAndCheckForRedirect = (newUserData: User | null | undefined) => {
     setUser(newUserData);
     async function redirectToCreation() {
+      if (!newUserData) return
       const { data, error } = await supabase
         .from("clinics")
         .select("id")
-        .eq("id", newUserData?.id);
+        .eq("id", newUserData.id);
       if (!error) {
         console.log(data.length);
         if (data.length == 0) {
@@ -82,7 +90,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [supabase.auth]);
 
   return (
-    <AppProvider>
+    <AppProvider theme={lightTheme}>
       <NotificationsProvider>
         <UserContext.Provider value={user}>
           <Navbar />

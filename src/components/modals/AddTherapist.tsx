@@ -51,8 +51,9 @@ const AddTherapist = () => {
                 specialization: formData.get("specialization"),
                 ageRange: formData.get("ageRange"),
                 bio: formData.get("bio"),
-              })
+              } as any)
               .select();
+
             if (error != null) {
               notifications.show("Error: " + error.message, {
                 severity: "error",
