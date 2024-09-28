@@ -14,7 +14,8 @@ const config: Config = {
         "primary-blue": "#2196F3",
         "gray-background": "#C5C5C5",
         "text-gray": "#7A7A7A",
-        "text-light-gray": "#B3B3B4"
+        "text-light-gray": "#B3B3B4",
+        "text-dark-gray": "#2D3035"
       },
       backgroundImage: {
         "landing-page-bg": "url('/landing-page-bg.svg')"

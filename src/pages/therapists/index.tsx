@@ -218,6 +218,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     };
   }
+
+  const clinicRes = await supabase
+    .from("clinics")
+    .select()
+    .eq("id", userRes.data.user.id);
+  if (clinicRes.error || !clinicRes.data || clinicRes.data.length == 0) {
+    return {
+      redirect: {
+        destination: "/create-clinic",
+        permanent: false,
+      },
+    };
+  }
+
   const therapistRes = await supabase
     .from("therapists")
     .select()
@@ -231,18 +245,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-  const clinicRes = await supabase
-    .from("clinics")
-    .select()
-    .eq("id", userRes.data.user.id);
-  if (clinicRes.error || !clinicRes.data) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
+  
   return {
     props: {
       therapists: therapistRes.data,
