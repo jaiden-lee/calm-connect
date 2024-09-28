@@ -44,10 +44,11 @@ export default function App({ Component, pageProps }: AppProps) {
   const setUserAndCheckForRedirect = (newUserData: User | null | undefined) => {
     setUser(newUserData);
     async function redirectToCreation() {
+      if (!newUserData) return
       const { data, error } = await supabase
         .from("clinics")
         .select("id")
-        .eq("id", newUserData?.id);
+        .eq("id", newUserData.id);
       if (!error) {
         console.log(data.length);
         if (data.length == 0) {

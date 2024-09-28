@@ -19,6 +19,7 @@ function Signup() {
 
   async function handleSubmit(e: FormEvent) {
     e.stopPropagation();
+    e.preventDefault();
     const { data, error } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,

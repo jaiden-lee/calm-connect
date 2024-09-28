@@ -1,7 +1,8 @@
 import { createServerClient, serializeCookieHeader } from "@supabase/ssr";
 import { type NextApiRequest, type NextApiResponse } from "next";
+import { Database } from '../../database.types'
 
-export default function createClient(
+export default function createClient<Database>(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
