@@ -3,6 +3,9 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ## Getting Started
 npx supabase gen types typescript --project-id nrmubhxzpelhrvlryrgs > src/database.types.ts
 
+Run this to fix binary
+npx supabase gen types typescript --project-id nrmubhxzpelhrvlryrgs | Set-Content -Encoding utf8 ./src/database.types.ts
+
 First, run the development server:
 
 ```bash

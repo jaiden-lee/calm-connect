@@ -38,6 +38,7 @@ const TherapistProfile = (props: {name: string, bio: string, specialization: str
             label="Name"
             type="text"
             fullWidth
+            className="text-black"
             disabled
             value={props.name}
           />
