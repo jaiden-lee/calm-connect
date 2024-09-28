@@ -15,6 +15,7 @@ import {
   Switch,
   FormControlLabel,
   Button,
+  Link,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircle } from "@fortawesome/free-solid-svg-icons";
@@ -194,6 +195,7 @@ export default function Therapists({
                     </Typography>{" "}
                     {therapist.ageRange}
                     <Typography>{therapist.bio}</Typography>
+                    <Link href={"/therapist/" + therapist.id} className="mt-2">{therapist.name}'s Booking Page</Link>
                   </Container>
                 </div>
                 <Divider
