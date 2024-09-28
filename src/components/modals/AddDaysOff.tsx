@@ -78,7 +78,7 @@ const AddDaysOff = ({ triggerCalRefresh, therapistData }: props) => {
                 autoHideDuration: 3000,
               });
             } else {
-              notifications.show("Successfully created " + JSON.stringify(data[0]), {
+              notifications.show("Successfully created " + JSON.stringify(data[0].days_off.at(-1)), {
                 autoHideDuration: 3000,
               });
               triggerCalRefresh();

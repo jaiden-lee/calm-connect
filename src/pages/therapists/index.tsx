@@ -188,7 +188,7 @@ export default function Therapists({
                   </Grid>
                   <Container className="flex gap-4">
                     <Link
-                      href={"/therapist/" + therapist.id}
+                      href={"/therapists/" + therapist.id}
                       className="mt-2 text-primary-blue  hover:underline"
                     >
                       View Bookings
