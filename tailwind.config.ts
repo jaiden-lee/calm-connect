@@ -9,11 +9,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "#F5F7FA",
+        "text-black": "#171A1F",
+        "primary-blue": "#2196F3",
+        "gray-background": "#C5C5C5",
+        "text-gray": "#7A7A7A",
+        "text-light-gray": "#B3B3B4"
       },
+      backgroundImage: {
+        "landing-page-bg": "url('/landing-page-bg.svg')"
+      }
     },
   },
   plugins: [],
+  mode: "jit"
 };
 export default config;

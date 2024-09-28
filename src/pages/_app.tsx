@@ -7,13 +7,31 @@ import { UserContext } from "@/utils/context";
 import { useRouter } from "next/router";
 import Navbar from "@/components/Navbar";
 import { AppProvider, NotificationsProvider } from "@toolpad/core";
-import { createTheme, ThemeProvider } from "@mui/material";
+import { inter } from "@/utils/fonts";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 
 const lightTheme = createTheme({
   palette: {
-    mode: "light",
+    mode: 'light',
+    info: {
+      main: "#D5D5D5"
+    }
   },
+  colorSchemes: {
+    dark: false
+  },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+
+        }
+      }
+    }
+  }
 });
+
 
 export default function App({ Component, pageProps }: AppProps) {
   const supabase = createClient();
@@ -48,15 +66,15 @@ export default function App({ Component, pageProps }: AppProps) {
     ) {
       router.push("/dashboard");
     }
-    if (
-      !newUserData &&
-      (router.pathname === "/dashboard" ||
-        router.pathname.startsWith("/therapists") ||
-        router.pathname === "/edit-clinic" ||
-        router.pathname === "/create-clinic")
-    ) {
-      router.push("/");
-    }
+    // if (
+    //   !newUserData &&
+    //   (router.pathname === "/dashboard" ||
+    //     router.pathname.startsWith("/therapists") ||
+    //     router.pathname === "/edit-clinic" ||
+    //     router.pathname === "/create-clinic")
+    // ) {
+    //   router.push("/");
+    // }
     if (newUserData && !isNewClinic && router.pathname !== "/create-clinic") {
       // if logged in, but account not set up, so clinic name not assigned yet
       redirectToCreation();
@@ -92,10 +110,12 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <AppProvider theme={lightTheme}>
       <NotificationsProvider>
-        <UserContext.Provider value={user}>
-          <Navbar />
-          <Component {...pageProps} />
-        </UserContext.Provider>
+          <UserContext.Provider value={user}>
+            <div className={`${inter.className} min-h-full`}>
+              <Navbar />
+              <Component {...pageProps} />
+            </div>
+          </UserContext.Provider>
       </NotificationsProvider>
     </AppProvider>
   );

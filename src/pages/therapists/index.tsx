@@ -198,7 +198,7 @@ export default function Therapists({
                     <Link href={"/therapist/" + therapist.id} className="mt-2">{therapist.name}'s Booking Page</Link>
                   </Container>
                 </div>
-                <Divider
+                <Divider key={therapist.id + "d"}
                   aria-hidden="true"
                   className="my-4 bg-stone-500 color-stone-500 h-0"
                 />
