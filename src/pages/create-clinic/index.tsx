@@ -13,6 +13,7 @@ function CreateClinic() {
   const [formData, setFormData] = useState({
     clinicName: "",
     clinicWelcomeMessage: "",
+    clinicRoutingCode: "",
   });
 
   if (user == null) {
@@ -73,6 +74,19 @@ function CreateClinic() {
         multiline
         margin="normal"
         minRows={2}
+      />{" "}
+      <br />
+      <TextField
+        onChange={(e) =>
+          setFormData((prev) => {
+            return { ...prev, clinicRoutingCode: e.target.value };
+          })
+        }
+        value={formData.clinicRoutingCode}
+        id="clinicRoutingCode"
+        label="Clinic Routing Code"
+        name="clinicRoutingCode"
+        margin="normal"
       />{" "}
       <br />
       <Button type="submit">Submit</Button>
