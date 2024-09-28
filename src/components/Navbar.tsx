@@ -28,6 +28,9 @@ function Navbar() {
               <Link href="/signup">
                 <Button size="medium" variant="contained" disableElevation className="button-primary">Sign Up</Button>
               </Link>
+              <Link href="/login">
+                <Button size="medium" disableElevation className="">Log In</Button>
+              </Link>
             </>
             :
             <>
@@ -38,18 +41,6 @@ function Navbar() {
           }
         </div>
       </div>
-
-      {/* {user ? (
-        <>
-          <p>Logged in as: {user.email}</p>
-          <Button onClick={handleSignout}>Sign out</Button>
-        </>
-      ) : (
-        <>
-          <Link href="/signup">Sign Up</Link>
-          <Link href="/login">Log In</Link>
-        </>
-      )} */}
     </nav>
   );
 }

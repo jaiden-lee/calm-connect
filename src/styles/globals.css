@@ -8,6 +8,10 @@
         @apply rounded-full shadow-none bg-primary-blue text-white font-medium capitalize;
     }
 
+    .button-secondary {
+        @apply rounded-full shadow-none border-primary-blue border font-medium capitalize;
+    }
+
     .button-group-selected {
         @apply bg-primary-blue text-white font-medium capitalize;
     }
