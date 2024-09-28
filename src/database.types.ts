@@ -75,6 +75,7 @@ export type Database = {
       }
       therapists: {
         Row: {
+          age: number | null
           ageRange: string | null
           bio: string | null
           clinic_id: string | null
@@ -85,6 +86,7 @@ export type Database = {
           specialization: string | null
         }
         Insert: {
+          age?: number | null
           ageRange?: string | null
           bio?: string | null
           clinic_id?: string | null
@@ -95,6 +97,7 @@ export type Database = {
           specialization?: string | null
         }
         Update: {
+          age?: number | null
           ageRange?: string | null
           bio?: string | null
           clinic_id?: string | null
