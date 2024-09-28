@@ -3,8 +3,6 @@ import { createClient as createServerClient } from "@/utils/supabase/server-prop
 import { GetServerSidePropsContext } from "next";
 import { ChangeEvent, FormEvent, useState } from "react";
 
-
-
 function Signup() {
     const supabase = createClient();
 
