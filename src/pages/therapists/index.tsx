@@ -3,6 +3,7 @@ import type { GetServerSidePropsContext } from "next";
 
 import { createClient } from "@/utils/supabase/server-props";
 import { createClient as createClientFrontend } from "@/utils/supabase/component";
+import TherapistProfile from "@/components/modals/TherapistProfile";
 
 import { Tables } from "@/database.types";
 import {
@@ -15,13 +16,14 @@ import {
   Switch,
   FormControlLabel,
   Button,
-  Link,
+  Link as MUILink,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircle } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { useNotifications } from "@toolpad/core";
+import Link from "next/link";
 
 export default function Therapists({
   therapists,
@@ -64,9 +66,9 @@ export default function Therapists({
     }
   };
   return (
-    <>
+    <div className="p-8">
       <Container className="max-w-screen-md">
-        <Typography>Clinic Information</Typography>
+        <h1 className="text-2xl font-bold">Dashboard</h1>
         <Container className="p-2">
           <Grid container gap={"1em"}>
             <Grid size="grow">
@@ -153,8 +155,8 @@ export default function Therapists({
             label="Edit"
           />
         </Container>
-        <Typography>Therapists Information</Typography>
-        <Container className="p-2">
+        <h2 className="text-xl font-medium">Therapists</h2>
+        <Container className="p-2 px-6 bg-white rounded-md mt-4 shadow-sm">
           {therapists.map((therapist: any) => {
             return (
               <>
@@ -184,23 +186,14 @@ export default function Therapists({
                       {therapist.age}
                     </Grid>
                   </Grid>
-                  <Container>
-                    <Typography className="font-bold inline">
-                      Specializations:{" "}
-                    </Typography>{" "}
-                    {therapist.specialization}
-                    <br />
-                    <Typography className="font-bold inline">
-                      Age Range:{" "}
-                    </Typography>{" "}
-                    {therapist.ageRange}
-                    <Typography>{therapist.bio}</Typography>
-                    <Link href={"/therapist/" + therapist.id} className="mt-2">{therapist.name}&apos;s Booking Page</Link>
+                  <Container className="flex gap-4">
+                    <Link href={"/therapist/" + therapist.id} className="mt-2 text-primary-blue  hover:underline">View Bookings</Link>
+                    <TherapistProfile name={therapist.name} bio={therapist.bio} ethnicity={therapist.ethnicity} gender={therapist.gender} specialization={therapist.specialization} ageRange={therapist.ageRange} age={therapist.age} />
                   </Container>
                 </div>
                 <Divider key={therapist.id + "d"}
                   aria-hidden="true"
-                  className="my-4 bg-stone-500 color-stone-500 h-0"
+                  className="my-4 h-0"
                 />
               </>
             );
@@ -208,7 +201,7 @@ export default function Therapists({
           <AddTherapist />
         </Container>
       </Container>
-    </>
+    </div>
   );
 }
 
