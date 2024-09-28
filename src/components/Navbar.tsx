@@ -1,6 +1,8 @@
 import { UserContext } from "@/utils/context";
 import { useContext } from "react";
 import { createClient } from "@/utils/supabase/component";
+import { Button } from "@mui/material";
+import Link from "next/link";
 
 function Navbar() {
     const supabase = createClient();
@@ -12,9 +14,14 @@ function Navbar() {
 
     return (
         <nav>
-            <p>Logged in as: {user?.email}</p>
-            
-            <button onClick={handleSignout}>Sign out</button>
+            {user ? <>
+                <p>Logged in as: {user.email}</p>
+                <Button onClick={handleSignout}>Sign out</Button>
+                </> 
+            : <>
+                <Link href="/signup">Sign Up</Link>
+                <Link href="/login">Log In</Link>
+            </>}
         </nav>
     );
 }
