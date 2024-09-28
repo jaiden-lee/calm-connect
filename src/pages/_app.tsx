@@ -7,6 +7,7 @@ import { UserContext } from "@/utils/context";
 import { useContext } from "react";
 import { useRouter } from "next/router";
 import Navbar from "@/components/Navbar";
+import { AppProvider } from "@toolpad/core";
 
 export default function App({ Component, pageProps }: AppProps) {
   const supabase = createClient();
@@ -68,13 +69,13 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [user, router, isNewClinic]); // redirects
 
   return (
-    <div>
+    <AppProvider>
       <UserContext.Provider value={user}>
         <Navbar />
         {/* Navbar probably goes here or something */}
       
         <Component {...pageProps} />
       </UserContext.Provider>
-    </div>
+    </AppProvider>
   );
 }
