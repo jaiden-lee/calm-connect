@@ -1,10 +1,10 @@
 import { createClient } from "@/utils/supabase/component";
-import { createClient as createServerClient } from "@/utils/supabase/server-props";
-import { GetServerSidePropsContext } from "next";
+import { useNotifications } from "@toolpad/core";
 import { ChangeEvent, FormEvent, useState } from "react";
 
 function Signup() {
   const supabase = createClient();
+  const notifications = useNotifications();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -23,6 +23,16 @@ function Signup() {
       email: formData.email,
       password: formData.password,
     });
+    if (error != null) {
+      notifications.show("Error: " + error.message, {
+        severity: "error",
+        autoHideDuration: 3000,
+      });
+    } else {
+      notifications.show("Successfully created " + data.user?.email, {
+        autoHideDuration: 3000,
+      });
+    }
   }
 
   function onEmailChange(e: ChangeEvent<HTMLInputElement>) {

@@ -1,7 +1,6 @@
 import { UserContext } from "@/utils/context";
 import { createClient } from "@/utils/supabase/component";
 import { Button, TextField } from "@mui/material";
-import { redirect } from "next/navigation";
 import { type FormEvent, useContext, useState } from "react";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import router from "next/router";

@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   TextField,
 } from "@mui/material";
@@ -27,7 +26,8 @@ const AddTherapist = () => {
           onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
-            const formJson = Object.fromEntries((formData as any).entries());
+            // might need as any for form data 
+            const formJson = Object.fromEntries((formData).entries());
             const email = formJson.email;
             console.log(email);
             handleClose();

@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 
 import { createClient } from "@/utils/supabase/component";
+import { Button } from "@mui/material";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function LoginPage() {
     }
     router.push("/");
   }
-  function signUpWithGoogle() {
+  function signInWithGoogle() {
     supabase.auth.signInWithOAuth({
       provider: "google",
     });
@@ -46,7 +47,7 @@ export default function LoginPage() {
           Log in
         </button>
         <div>
-          <button onClick={signUpWithGoogle}>Sign up with google</button>
+          <Button onClick={signInWithGoogle}>Log in with google</Button>
         </div>
       </form>
     </main>
