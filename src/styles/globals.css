@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@layer components {
+    .button-primary {
+        @apply rounded-full shadow-none bg-primary-blue text-white font-medium capitalize;
+    }
+
+    .button-group-selected {
+        @apply bg-primary-blue text-white font-medium capitalize;
+    }
+
+    .button-group-unselected {
+        @apply bg-gray-background text-text-gray font-medium capitalize;
+    }
+
+    .text-field-search-bar fieldset {
+        @apply w-full border-none outline-none;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+    /* Hide scrollbar for IE, Edge, and Firefox */
+    .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    }
+}
