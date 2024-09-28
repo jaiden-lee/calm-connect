@@ -28,27 +28,44 @@ const AddTherapist = () => {
                     },
                 }}
             >
-                <DialogTitle>Subscribe</DialogTitle>
+                <DialogTitle>Add a therapist to clinic</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
-                        To subscribe to this website, please enter your email
-                        address here. We will send updates occasionally.
-                    </DialogContentText>
                     <TextField
                         autoFocus
                         required
                         margin="dense"
                         id="name"
-                        name="email"
-                        label="Email Address"
-                        type="email"
+                        name="therapistName"
+                        label="Name"
+                        type="text"
                         fullWidth
-                        variant="standard"
+                    />
+                    <TextField
+                        autoFocus
+                        required
+                        margin="dense"
+                        id="ethnicity"
+                        name="therapistEthnicity"
+                        label="Ethnicity"
+                        type="text"
+                        fullWidth
+                    />
+                    <TextField
+                        autoFocus
+                        required
+                        margin="dense"
+                        id="matchDescription"
+                        name="therapistMatchDescription"
+                        label="Match Description"
+                        type="text"
+                        fullWidth
+                        multiline
+                        minRows={2}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button type="submit">Subscribe</Button>
+                    <Button type="submit">Create</Button>
                 </DialogActions>
             </Dialog>
         </>
