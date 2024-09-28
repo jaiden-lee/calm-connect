@@ -9,20 +9,59 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          created_at: string
+          id: number
+          patient: number | null
+          therapist: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          patient?: number | null
+          therapist?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          patient?: number | null
+          therapist?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_patient_fkey"
+            columns: ["patient"]
+            isOneToOne: false
+            referencedRelation: "patient"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_therapist_fkey"
+            columns: ["therapist"]
+            isOneToOne: false
+            referencedRelation: "therapists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clinics: {
         Row: {
           id: string
           name: string | null
+          routing_code: string
           welcome_message: string
         }
         Insert: {
           id: string
           name?: string | null
+          routing_code: string
           welcome_message?: string
         }
         Update: {
           id?: string
           name?: string | null
+          routing_code?: string
           welcome_message?: string
         }
         Relationships: [

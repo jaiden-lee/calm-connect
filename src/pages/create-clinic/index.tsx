@@ -1,6 +1,6 @@
 import { UserContext } from "@/utils/context";
 import { createClient } from "@/utils/supabase/component";
-import { Button, TextField } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import { type FormEvent, useContext, useState } from "react";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import router from "next/router";
@@ -28,6 +28,7 @@ function CreateClinic() {
       .insert({
         name: formData.clinicName,
         welcome_message: formData.clinicWelcomeMessage,
+        routing_code: formData.clinicRoutingCode,
         id: user.id,
       })
       .select();
@@ -37,7 +38,7 @@ function CreateClinic() {
         autoHideDuration: 3000,
       });
     } else {
-      notifications.show("Successfully created" + data[0].name, {
+      notifications.show("Successfully created " + data[0].name, {
         autoHideDuration: 3000,
       });
       router.push("/therapists");
@@ -76,6 +77,8 @@ function CreateClinic() {
         minRows={2}
       />{" "}
       <br />
+      <Typography className="my-2">People who want to book with your clinic will first text your routing code to our master line</Typography>
+      <Typography className="my-2 italic">Bring your own phone number coming soon</Typography>
       <TextField
         onChange={(e) =>
           setFormData((prev) => {
@@ -87,6 +90,7 @@ function CreateClinic() {
         label="Clinic Routing Code"
         name="clinicRoutingCode"
         margin="normal"
+        required
       />{" "}
       <br />
       <Button type="submit">Submit</Button>
