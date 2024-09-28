@@ -16,7 +16,7 @@ function Navbar() {
   return (
     <nav className="h-16 w-full px-8 flex justify-center items-center border-b-[1px]">
       <div className="w-full max-w-[72rem] flex items-center">
-        <Link href={user ? "/dashboard" : "/"} className="text-base font-semibold flex items-center">
+        <Link href={user ? "/therapists" : "/"} className="text-base font-semibold flex items-center">
         <Image src="/logo.svg" alt="Logo" width={45} height={45} className="w-10"/> Calm Connect</Link>
 
         <div className="flex items-center ml-auto gap-8">
