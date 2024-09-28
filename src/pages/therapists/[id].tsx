@@ -189,10 +189,6 @@ function Dashboard(props: PageProps) {
     };
   }
 
-  useEffect(() => {
-    console.log(daysOff)
-  },[daysOff])
-
   return (
     <div className="w-full p-8 flex flex-col justify-center gap-8">
       <h1 className="text-3xl font-bold">Welcome, {props.therapist.name}!</h1>
