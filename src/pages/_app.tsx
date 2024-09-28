@@ -61,24 +61,28 @@ export default function App({ Component, pageProps }: AppProps) {
 
     if (
       newUserData &&
-      (router.pathname === "/signup" || router.pathname === "/login")
+      (router.pathname === "/signup" || router.pathname === "/login" || router.pathname === "/")
     ) {
-      router.push("/dashboard");
+      router.push("/therapists");
     }
-    // if (
-    //   !newUserData &&
-    //   (router.pathname === "/dashboard" ||
-    //     router.pathname.startsWith("/therapists") ||
-    //     router.pathname === "/edit-clinic" ||
-    //     router.pathname === "/create-clinic")
-    // ) {
-    //   router.push("/");
-    // }
+    if (
+      !newUserData &&
+      (router.pathname === "/dashboard" ||
+        router.pathname.startsWith("/therapists") ||
+        router.pathname === "/edit-clinic" ||
+        router.pathname === "/create-clinic")
+    ) {
+      router.push("/");
+    }
     if (newUserData && !isNewClinic && router.pathname !== "/create-clinic") {
       // if logged in, but account not set up, so clinic name not assigned yet
       redirectToCreation();
     }
   };
+
+  useEffect(() => {
+    setUserAndCheckForRedirect(user);
+  }, [supabase, router, user])
 
   useEffect(() => {
     async function initialSignin() {
