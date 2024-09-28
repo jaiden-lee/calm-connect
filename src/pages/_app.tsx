@@ -8,8 +8,7 @@ import { useRouter } from "next/router";
 import Navbar from "@/components/Navbar";
 import { AppProvider, NotificationsProvider } from "@toolpad/core";
 import { inter } from "@/utils/fonts";
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+import { createTheme } from '@mui/material/styles';
 
 const lightTheme = createTheme({
   palette: {

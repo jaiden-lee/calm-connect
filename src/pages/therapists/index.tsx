@@ -195,7 +195,7 @@ export default function Therapists({
                     </Typography>{" "}
                     {therapist.ageRange}
                     <Typography>{therapist.bio}</Typography>
-                    <Link href={"/therapist/" + therapist.id} className="mt-2">{therapist.name}'s Booking Page</Link>
+                    <Link href={"/therapist/" + therapist.id} className="mt-2">{therapist.name}&apos;s Booking Page</Link>
                   </Container>
                 </div>
                 <Divider key={therapist.id + "d"}
