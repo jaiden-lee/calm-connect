@@ -63,7 +63,7 @@ export default function Therapists({
                 <Typography>{therapist.bio}</Typography>
               </Container>
             </div>
-            <Divider aria-hidden="true" className="my-4 bg-stone-500 color-stone-500 h-.5" />
+            <Divider aria-hidden="true" className="my-4 bg-stone-500 color-stone-500 h-0" />
           </>
         );
       })}
