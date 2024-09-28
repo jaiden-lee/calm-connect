@@ -5,6 +5,7 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import { GetServerSidePropsContext } from "next";
 import { createClient } from "@/utils/supabase/server-props";
+import { stringOrFirstString } from "@/utils/helper";
 
 type FilterType = "All" | "Pending" | "Accepted";
 type Patient = {
@@ -25,13 +26,15 @@ type Appointment = {
 }
 type PageProps = {
     id: string,
-    appointments: Appointment[]
+    appointments: Appointment[],
+    error?: string
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const supabase = createClient(context);
-    const {data, error} = await supabase.auth.getUser();
-    if (error) {
+    const id = stringOrFirstString(context.params?.id);
+    const {data: userData, error} = await supabase.auth.getUser();
+    if (error || !id || isNaN(Number(id))) {
         return {
             redirect: {
                 destination: "/",
@@ -39,12 +42,51 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             }
         }
     }
+    
+    const user = userData.user;
+    const {data: clinicData, error: clinicError} = await supabase.from("therapists").select("*").eq("id", id).eq("clinic_id", user.id);
+    // Redirects if try to access therapist data from wrong clinic
+    if (clinicError || clinicData.length == 0) {
+        return {
+            redirect: {
+                destination: "/therapists",
+                permanent: false
+            }
+        }
+    }
 
+    const {data: appointmentsData, error: appointmentsError} = await supabase.rpc("get_appointments", {
+        therapist_id: Number(id)
+    });
+
+    if (appointmentsError) {
+        return {
+            props: {
+                id: id,
+                appointments: [],
+                // error: appointmentsError?.message
+            }
+        }
+    }
+    return {
+        props: {
+            id: id,
+            appointments: appointmentsData,
+            // error: appointmentsError?.message
+        }
+    }
 }
 
-function Dashboard() {
+function Dashboard(props: PageProps) {
     const [filter, setFilter] = useState<FilterType>("All");
-
+    const [events, setEvents] = useState(() => {
+        return props.appointments.map((appointment) => {
+            return {title: appointment.name, date: appointment.created_at}
+        })
+    });
+    const cards = props.appointments.map((appointment) => {
+        return <PatientCard key={appointment.id} id={appointment.id} date={appointment.created_at} patientName={appointment.name} description={appointment.description}/>
+    });
     
     function handleFilterChange(newFilter: FilterType) {
         return () => {
@@ -74,7 +116,7 @@ function Dashboard() {
                     </div>
                 </div>
                 {/* Appointments */}
-                <div className="w-[50%] flex flex-col gap-8 justify-center items-center">
+                <div className="w-[50%] flex flex-col gap-8 items-center">
                     {/* Top */}
                     <div className="flex w-full items-center gap-8">
                         <div className="text-field-search-bar w-full max-w-96 flex">
@@ -93,13 +135,8 @@ function Dashboard() {
                         </ButtonGroup>
                     </div>
                     {/* Main */}
-                    <main className="grid justify-items-center grid-cols-[repeat(auto-fill,minmax(13rem,1fr))] gap-8 w-full max-h-[70vh] overflow-auto no-scrollbar pb-6">
-                        <PatientCard id={"10"} date={new Date()} patientName="George Burdell" description={"George is a 21 year old male looking for a therapist for general anxiety management."} />
-                        <PatientCard id={"10"} date={new Date()} patientName="George Burdell" description={"George is a 21 year old male looking for a therapist for general anxiety management."} />
-                        <PatientCard id={"10"} date={new Date()} patientName="George Burdell" description={"George is a 21 year old male looking for a therapist for general anxiety management."} />
-                        <PatientCard id={"10"} date={new Date()} patientName="George Burdell" description={"George is a 21 year old male looking for a therapist for general anxiety management."} />
-                        <PatientCard id={"10"} date={new Date()} patientName="George Burdell" description={"George is a 21 year old male looking for a therapist for general anxiety management."} />
-                        <PatientCard id={"10"} date={new Date()} patientName="George Burdell" description={"George is a 21 year old male looking for a therapist for general anxiety management."} />
+                    <main className="grid justify-items-center grid-cols-[repeat(auto-fill,minmax(13rem,1fr))] gap-8 w-full h-[70vh] overflow-auto no-scrollbar pb-6">
+                        {cards}
                     </main>
                 </div>
             </div>

@@ -19,7 +19,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@mui/material": "^6.1.1",
     "@supabase/ssr": "^0.5.1",
-    "@supabase/supabase-js": "^2.45.4",
+    "@supabase/supabase-js": "^2.45.3",
     "@toolpad/core": "^0.7.0",
     "next": "14.2.13",
     "react": "^18",
