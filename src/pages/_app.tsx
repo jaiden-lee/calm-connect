@@ -67,7 +67,7 @@ export default function App({ Component, pageProps }: AppProps) {
     if (
       !newUserData &&
       (router.pathname === "/dashboard" ||
-        router.pathname.startsWith("/therapists") ||
+        router.pathname === "/therapists" ||
         router.pathname === "/edit-clinic" ||
         router.pathname === "/create-clinic")
     ) {
