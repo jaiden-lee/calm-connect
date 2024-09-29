@@ -1,5 +1,5 @@
 import { Button, TextField, ButtonGroup } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PatientCard from "@/components/PatientCard";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -10,17 +10,10 @@ import { stringOrFirstString } from "@/utils/helper";
 import { Tables } from "@/database.types";
 import AddAvailabilities from "@/components/modals/AddAvailabilities";
 import dayjs from "dayjs";
-import { title } from "process";
 import AddDaysOff from "@/components/modals/AddDaysOff";
 
 type FilterType = "All" | "Pending" | "Accepted";
-type Patient = {
-  id: string,
-  phone_number: string,
-  name: string,
-  is_new: boolean,
-  description: string
-};
+
 type Appointment = {
   id: string,
   created_at: Date,

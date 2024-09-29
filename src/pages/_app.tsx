@@ -11,6 +11,7 @@ import { inter } from "@/utils/fonts";
 import { createTheme } from "@mui/material/styles";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 
 const lightTheme = createTheme({
   palette: {
@@ -110,6 +111,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [supabase.auth]);
 
   return (
+    <AppCacheProvider >
     <AppProvider theme={lightTheme}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <NotificationsProvider>
@@ -122,5 +124,6 @@ export default function App({ Component, pageProps }: AppProps) {
         </NotificationsProvider>
       </LocalizationProvider>
     </AppProvider>
+    </AppCacheProvider>
   );
 }
