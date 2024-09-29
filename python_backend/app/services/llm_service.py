@@ -4,21 +4,45 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import logging
 from flask import session
-from app.services.supabase_service import get_all_therapists, get_therapist_by_id
+from app.services.supabase_service import get_all_therapists, get_therapist_by_id, create_patient, make_appointment, init_supabase
 from app.services.twilio_service import send_sms
 from flask import session
 import json
+from datetime import datetime
 load_dotenv()
 
 import os
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
 
+def store_user_and_appointment(text_json, supabase_client, from_number):
+    response =  json.loads(text_json.split('JSON')[1].strip())
+    patient_info = response["patient_info"]
+    appointment_info = response["appointment_info"]
+    patient_created = create_patient(
+        client=supabase_client, 
+        phone_number=from_number, 
+        name=patient_info['patient_name'], 
+        therapist_id=patient_info["therapist_id"],  
+        description=patient_info["description"]
+    )
+    if patient_created:
+        patient_id = patient_created.get('id')
+        appt_created = make_appointment(
+            client=supabase_client, 
+            therapist_id=patient_info["therapist_id"], 
+            patient_id=patient_id, 
+            start_time=appointment_info["appointment_start_date_time"],
+            duration = appointment_info["appointment_length_minutes"]
+        )
+        if appt_created:
+            logging.info(f"Appointment id is {appt_created}")
+    else:
+        logging.error("Failed to create patient")
 
 def get_therapist_match(from_number,supabase_client, user_message,conversation_state):
     all_therapists = get_all_therapists(supabase_client)
     
     therapist_info = "\n".join([f"Therapist name: {t['name']}, ID: {t['id']},  Age: {t['age']}, Ethnicity: {t['ethnicity']}, gender: {t['gender']}, specialization: {t['specialization']}, ageRange: {t['ageRange']}, Bio: {t['bio']}, Availability: {t['availabilities']}, days_off: {t['days_off']}" for t in all_therapists])
-    
 
     """
     For a new patient, engages in a conversation with llm to gather information and then at end, matches with therapist
@@ -43,8 +67,7 @@ def get_therapist_match(from_number,supabase_client, user_message,conversation_s
         2. Gather the following patient demographics:
         - First Name
         - Type of therapy services they are looking for
-        - What days of the week they are available for a consultation
-        - What time of the day they are available for a consultation (Morning (8am-12pm), Afternoon (12-4pm), Evening (4-8pm))
+        - What days of the week they are available for a consultation and time of the day they are available for a consultation
         
         Here are the instructions you must strictly follow for all future messages:
         - Be sure to start EXACTLY with the welcome message "{intro_message}"
@@ -61,57 +84,53 @@ def get_therapist_match(from_number,supabase_client, user_message,conversation_s
         Follow ALL of these instructions and have a conversation with the patient.
         
         You are an AI SMS-based therapy scheduling assistant designed to provide users with a seamless and supportive experience while booking appointments with therapists. Your primary goal is to help users identify their needs and preferences for therapy, guiding them through the scheduling process in a friendly and empathetic manner.
-Key Responsibilities:
+        Key Responsibilities:
 
-Initial Engagement: Begin the conversation by welcoming the user and inviting them to share their needs regarding therapy. Use open-ended questions to encourage them to express their thoughts and feelings.
+        Initial Engagement: Begin the conversation by welcoming the user and inviting them to share their needs regarding therapy. Use open-ended questions to encourage them to express their thoughts and feelings.
 
-Identifying Preferences: Ask questions to gather information about:
+        Identifying Preferences: Ask questions to gather information about:
 
-The type of therapy they are seeking (e.g., individual therapy, couples therapy, group sessions).
-Any specific issues they want to address (e.g., anxiety, depression, relationship issues).
-Preferred therapist characteristics (e.g., gender, age, experience).
-Availability for appointments (days of the week, times of day).
-Providing Options: Based on the information gathered, present users with suitable therapist options and available appointment times. Be sure to highlight any relevant qualifications or specialties of the therapists.
+        The type of therapy they are seeking (e.g., individual therapy, couples therapy, group sessions).
+        Any specific issues they want to address (e.g., anxiety, depression, relationship issues).
+        Preferred therapist characteristics (e.g., gender, age, experience).
+        Availability for appointments (days of the week, times of day).
+        Providing Options: Based on the information gathered, present users with suitable therapist options and available appointment times. Be sure to highlight any relevant qualifications or specialties of the therapists.
 
-Confirmation Process: Once the user has selected a therapist and an appointment time, confirm the details with them. Ask if they need any additional information or support regarding the session.
+        You can offer a therapist as an option to the user. Try to find way that the therapist in our system matches the user's therapy needs. 
 
-Supportive Closure: After confirming the appointment, provide a warm and supportive message, reminding the user that seeking help is a positive step. Reassure them that they can reach out for further assistance if needed.
+        Confirmation Process: Once the user has selected a therapist and an appointment time, confirm the details with them. Ask if they need any additional information or support regarding the session.
 
-Ending the Conversation: Once the appointment is successfully booked and confirmed, conclude the interaction by stating "JSON" followed by a valid json in this formate
-{
-    patient_info: {
-    therapist_id: number, // the id of the therapist that the appointment will be scheduled with
-    patient_name: string, // the patient's name
-    description: string // attributes about the patient that will be helpful for the therapist
-    },
-    appointment_info: {
-        therapist_id: number, // the id of the therapist that the appointment will be scheduled with
-        appointment_length_minutes: number // the length of the appointment (usually 45 or 60 minutes is good)
-        appointment_start_date_time: ISO 8601 date string // The start time of the appointment, make sure that the therapist is free at this time
-    }
-}
+        Supportive Closure: After confirming the appointment, provide a warm and supportive message, reminding the user that seeking help is a positive step. Reassure them that they can reach out for further assistance if needed.
 
-example ending: 
-JSON{
-    patient_info: {
-    therapist_id: 2,
-    patient_name: "Jacob",
-    description: "Jacob is looking for couples counseling, I thought he would be a good fit for you because he is 20 which is in your age range and you also specialize in couples counseling."
-    },
-    appointment_info: {
-        therapist_id: 2,
-        appointment_length_minutes: 60,
-        appointment_start_date_time: "2024-09-23T13:00:42.854Z"
-    }
-}
+        Ending the Conversation: Once the appointment is successfully booked and confirmed, conclude the interaction by stating "JSON" followed by a valid json in this formate
+        {
+            patient_info: {
+            therapist_id: number, // the id of the therapist that the appointment will be scheduled with
+            patient_name: string, // the patient's name
+            description: string // attributes about the patient that will be helpful for the therapist
+            },
+            appointment_info: {
+                therapist_id: number, // the id of the therapist that the appointment will be scheduled with
+                appointment_length_minutes: number // the length of the appointment (usually 45 or 60 minutes is good)
+                appointment_start_date_time: ISO 8601 date string // The start time of the appointment, make sure that the therapist is free at this time
+            }
+        }
 
-Throughout the conversation, maintain a compassionate and non-judgmental tone, ensuring the user feels comfortable and valued.
-        """+ therapist_info
-       
+        example ending: 
+        JSON{
+            patient_info: {
+            therapist_id: 2,
+            patient_name: "Jacob",
+            description: "Jacob is looking for couples counseling, I thought he would be a good fit for you because he is 20 which is in your age range and you also specialize in couples counseling."
+            },
+            appointment_info: {
+                therapist_id: 2,
+                appointment_length_minutes: 60,
+                appointment_start_date_time: "2024-09-23T13:00:42.854Z"
+            }
+        }
 
-        #  - Ask them for their date or birth, don't specify it must be in  MM/DD/YYYY format, but in the final JSON, convert it to that format.
-        
-
+        Throughout the conversation, maintain a compassionate and non-judgmental tone, ensuring the user feels comfortable and valued."""+ therapist_info
         
 
         response = client.chat.completions.create(
@@ -156,8 +175,18 @@ Throughout the conversation, maintain a compassionate and non-judgmental tone, e
 
         assistant_response = assistant_response.choices[0].message.content.strip()
         print(f"----------\n\n assistant response is {assistant_response}\n\n----------")
+        sent_intro_message = send_sms(from_number, assistant_response.split('JSON')[0])
+        
+        conversation_state['current_step'] = 'conversation'
+        session[from_number] = conversation_state
+        session.modified = True
+        conversation_state['history'].append({
+            "role": "assistant",
+            "content": f"{assistant_response}"
+        })
         if "JSON" in assistant_response:
-            logging.warning(f"JSON output {assistant_response.split('JSON')[1]}")
+            store_user_and_appointment(assistant_response,supabase_client, from_number)
+            
     return
 
 

@@ -28,15 +28,13 @@ def create_blueprint(csrf):
 
         logging.info(f"\n\n curr state: {conversation_state['current_step']}")
         logging.info(f"----------\n\n conversation state with this number: {conversation_state}\n\n and session {session}\n\n----------")
-        if conversation_state['current_step'] == 'start': 
-            if found_patient:
-                pass
-                # TODO prob not needed: remind them of appointment coming up, its own function
-            else: # new patient
-                response = get_therapist_match(from_number,supabase_client, user_message=None,conversation_state=conversation_state)
-                logging.info(f"claude initialization response: {response}")
+        # if conversation_state['current_step'] == 'start': 
+
+        response = get_therapist_match(from_number,supabase_client, user_message,conversation_state=conversation_state)
+        logging.info(f"claude initialization response: {response}")
+                
      
-        elif conversation_state['current_step'] == 'gathering_info':
+        if conversation_state['current_step'] == 'gathering_info':
             response = get_therapist_match(from_number,supabase_client, user_message=user_message,conversation_state=conversation_state)
             logging.info(f"claude gathering info response: {response}")
         

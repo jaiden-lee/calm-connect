@@ -11,18 +11,16 @@ load_dotenv()
 
 def init_supabase() -> Client:
 
-    url = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
-    key = os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+    url = "https://nrmubhxzpelhrvlryrgs.supabase.co"
+    key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ybXViaHh6cGVsaHJ2bHJ5cmdzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNzQ4NzA4NSwiZXhwIjoyMDQzMDYzMDg1fQ.aSfMh1QnwZPULJFt8NYAXfwp9UvUU72iSiwD2SkvQmc"
+    # url = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
+    # key = os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
     if not url or not key:
         raise ValueError("Supabase URL and API Key must be set in the environment variables.")
     return create_client(url, key)
 
 def get_appointments(client: Client, user_id: int):
     response = client.table("appointments").select("*").eq("user_id", user_id).execute()
-    return response.data
-
-def create_appointment(client: Client, appointment_data: dict):
-    response = client.table("appointments").insert(appointment_data).execute()
     return response.data
 
 def get_all_patients(client: Client):
@@ -33,16 +31,18 @@ def get_all_patients(client: Client):
         print(f"Error fetching patients: {str(e)}")
         return []
 
-def make_appointment(client:Client,therapist_id: int = None, patient_id:int = None, start_time:str=None):
+def make_appointment(client:Client,therapist_id: int = None, patient_id:int = None, start_time:str=None, duration:str=None):
     try:
+        print(f"\n\ntrying to create an appt")
         data = {
             'created_at': f'{datetime.now()}',
-            'patient_id': patient_id,
-            'therapist_id': therapist_id,
-            'start_time': start_time
+            'patient': int(patient_id),
+            'therapist': int(therapist_id),
+            'appointment_start_time': start_time,
+            'appointment_length_minutes': duration
         }
         response = client.table('appointments').insert(data).execute()
-        logging.info(f"Created new appointment: {response.data}")
+        print(f"Created new appointment: {response.data}")
         return response.data[0] if response.data else None
     except Exception as e:
         logging.error(f"Error creating patient: {str(e)}")
@@ -59,22 +59,22 @@ def get_patient_by_phone(client: Client, phone_number: str):
     response = client.table("patient").select("*").eq("phone_number", phone_number).execute()
     return True if response.data else False
 
-def create_patient(client: Client, phone_number: str, name: str = None, description: str = None, details: str = None, therapist_id: int = None):
+def create_patient(client: Client, phone_number: str, name: str = None, description: str = None, therapist_id: int = None):
     try:
+        print(f"\n\n\ntrying to create a new patient")
         data = {
             'phone_number': phone_number,
             'name': name,
             'began_session': False,
             'description': description,
-            'details': details,
             'is_new': True,
-            'therapist_id': therapist_id,
+            'therapist_id': int(therapist_id),
         }
         response = client.table('patient').insert(data).execute()
         logging.info(f"Created new patient: {response.data}")
         return response.data[0] if response.data else None
     except Exception as e:
-        logging.error(f"Error creating patient: {str(e)}")
+        print(f"Error creating patient: {str(e)}")
         return None
 
 
