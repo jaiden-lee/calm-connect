@@ -17,9 +17,11 @@ from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
 def get_therapist_match(from_number,supabase_client, user_message,conversation_state):
     all_therapists = get_all_therapists(supabase_client)
     
-    therapist_info = "\n".join([f"Therapist name: {t['name']}, ID: {t['id']},  Age: {t['age']}, Ethnicity: {t['ethnicity']}, gender: {t['gender']}, specialization: {t['specialization']}, ageRange: {t['ageRange']}, Bio: {t['bio']}, Availability: {t['availabilities']}, days_off: {t['days_off']}" for t in all_therapists])
-    
-
+    therapist_info = "), (".join([f"""
+Therapist name: {t['name']}, ID: {t['id']},  Age: {t['age']}, Ethnicity: {t['ethnicity']}, gender: {t['gender']}, specialization: {t['specialization']}, ageRange: {t['ageRange']}, Bio: {t['bio']}, Availability: {t['availabilities']}, days_off: {t['days_off']}""" for t in all_therapists])
+    therapist_info = therapist_info["), ".length:]
+    therapist_info = therapist_info[:-1*" (".length]
+    therapist_info = "A list of the therapists in our system and their availability" + therapist_info
     """
     For a new patient, engages in a conversation with llm to gather information and then at end, matches with therapist
     """
@@ -43,8 +45,7 @@ def get_therapist_match(from_number,supabase_client, user_message,conversation_s
         2. Gather the following patient demographics:
         - First Name
         - Type of therapy services they are looking for
-        - What days of the week they are available for a consultation
-        - What time of the day they are available for a consultation (Morning (8am-12pm), Afternoon (12-4pm), Evening (4-8pm))
+        - What days of the week they are available for a consultation and time of the day they are available for a consultation
         
         Here are the instructions you must strictly follow for all future messages:
         - Be sure to start EXACTLY with the welcome message "{intro_message}"
@@ -72,6 +73,8 @@ Any specific issues they want to address (e.g., anxiety, depression, relationshi
 Preferred therapist characteristics (e.g., gender, age, experience).
 Availability for appointments (days of the week, times of day).
 Providing Options: Based on the information gathered, present users with suitable therapist options and available appointment times. Be sure to highlight any relevant qualifications or specialties of the therapists.
+
+You can offer a therapist as an option to the user. Try to find way that the therapist in our system matches the user's therapy needs. 
 
 Confirmation Process: Once the user has selected a therapist and an appointment time, confirm the details with them. Ask if they need any additional information or support regarding the session.
 
@@ -105,8 +108,7 @@ JSON{
     }
 }
 
-Throughout the conversation, maintain a compassionate and non-judgmental tone, ensuring the user feels comfortable and valued.
-        """+ therapist_info
+Throughout the conversation, maintain a compassionate and non-judgmental tone, ensuring the user feels comfortable and valued."""+ therapist_info
        
 
         #  - Ask them for their date or birth, don't specify it must be in  MM/DD/YYYY format, but in the final JSON, convert it to that format.
