@@ -30,6 +30,7 @@ const sendMessage = async (phone_number: string, message: string) => {
     });
 
     if (!response.ok) {
+      console.error(response)
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
