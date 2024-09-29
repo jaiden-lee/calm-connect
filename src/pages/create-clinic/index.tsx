@@ -3,13 +3,14 @@ import { createClient } from "@/utils/supabase/component";
 import { Button, TextField, Typography } from "@mui/material";
 import { type FormEvent, useContext, useState } from "react";
 import { useNotifications } from "@toolpad/core/useNotifications";
-import router from "next/router";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 function CreateClinic() {
   const supabase = createClient();
   const user = useContext(UserContext);
   const notifications = useNotifications();
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     clinicName: "",
