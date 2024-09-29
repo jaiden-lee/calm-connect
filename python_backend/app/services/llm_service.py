@@ -8,7 +8,7 @@ from app.services.supabase_service import get_all_therapists, get_therapist_by_i
 from app.services.twilio_service import send_sms
 from flask import session
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 load_dotenv()
 
 import os
@@ -46,8 +46,11 @@ def store_user_and_appointment(text_json, supabase_client, from_number):
 def get_therapist_match(from_number,supabase_client, user_message,conversation_state):
     all_therapists = get_all_therapists(supabase_client)
     
-    therapist_info = "\n".join([f"Therapist name: {t['name']}, ID: {t['id']},  Age: {t['age']}, Ethnicity: {t['ethnicity']}, gender: {t['gender']}, specialization: {t['specialization']}, ageRange: {t['ageRange']}, Bio: {t['bio']}, Availability: {t['availabilities']}, days_off: {t['days_off']}" for t in all_therapists])
-
+    therapist_info = "), (".join([f"""
+Therapist name: {t['name']}, ID: {t['id']},  Age: {t['age']}, Ethnicity: {t['ethnicity']}, gender: {t['gender']}, specialization: {t['specialization']}, ageRange: {t['ageRange']}, Bio: {t['bio']}, Availability: {t['availabilities']}, days_off: {t['days_off']}""" for t in all_therapists])
+    therapist_info = therapist_info[len("), "):]
+    therapist_info = therapist_info[:-1*len(" (")]
+    therapist_info = "A list of the therapists in our system and their availability" + therapist_info
     """
     For a new patient, engages in a conversation with llm to gather information and then at end, matches with therapist
     """
@@ -91,7 +94,7 @@ def get_therapist_match(from_number,supabase_client, user_message,conversation_s
         Key Responsibilities:
 
         Initial Engagement: Begin the conversation by welcoming the user and inviting them to share their needs regarding therapy. Use open-ended questions to encourage them to express their thoughts and feelings.
-
+        Today's data is""" + f"{datetime.now(timezone.utc).isoformat()}" + """Make sure to only schedule appointment times after today\'s date.
         Identifying Preferences: Ask questions to gather information about:
 
         The type of therapy they are seeking (e.g., individual therapy, couples therapy, group sessions).
@@ -100,12 +103,13 @@ def get_therapist_match(from_number,supabase_client, user_message,conversation_s
         Availability for appointments (days of the week, times of day).
         Providing Options: Based on the information gathered, present users with suitable therapist options and available appointment times. Be sure to highlight any relevant qualifications or specialties of the therapists.
 
+        You should offer a therapist as an option to the user. Try to explain way that one of our therapist in our system matches the user's therapy needs. 
+
         Based on the therapist info and the user details, match a therapist to the patient that best fits the user's therapy needs. 
 
         Once a therapist has been selected, ask them an appointment time slot that fit in both patient and therapist schedules. If they don't agree, keep prompting and if they do, begin the confirmation process. The time slot NEEDS to be a specific time for you to begin your confirmation message.
 
         Confirmation Process: Once the user has selected a therapist and an appointment time, confirm the details with them. Ask if they need any additional information or support regarding the session.
-
  
         Supportive Closure: After confirming the appointment, provide a warm and supportive message, reminding the user that seeking help is a positive step. Reassure them that they can reach out for further assistance if needed.
 
@@ -124,7 +128,7 @@ def get_therapist_match(from_number,supabase_client, user_message,conversation_s
         }
 
         example ending: 
-        JSON{
+        Thanks for your time Jacob, I have scheduled you for Sepetember 23rd.JSON{
             patient_info: {
             therapist_id: 2,
             patient_name: "Jacob",
@@ -136,6 +140,20 @@ def get_therapist_match(from_number,supabase_client, user_message,conversation_s
                 appointment_start_date_time: "2024-09-23T13:00:42.854Z"
             }
         }
+
+        Fantastic, Feyi! Your appointment with Jaiden Lee for a CBT therapy session is scheduled for Thursday at 7 pm.JSON{
+            "patient_info": {
+                "therapist_id": 5,
+                "patient_name": "Feyi",
+                "description": "Feyi is looking for CBT therapy and prefers Thursday evening appointments."
+            },
+            "appointment_info": {
+                "therapist_id": 5,
+                "appointment_length_minutes": 60,
+                "appointment_start_date_time": "2024-09-26T19:00:00.000Z"
+            }
+        }
+
 
         Throughout the conversation, maintain a compassionate and non-judgmental tone, ensuring the user feels comfortable and valued."""+ therapist_info
         
