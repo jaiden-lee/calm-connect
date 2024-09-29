@@ -34,7 +34,7 @@ function Navbar() {
             </>
             :
             <>
-              <Link href="">Home</Link>
+              <Link href="/therapists">Home</Link>
               <Link href="">Settings</Link>
               <Button size="medium" variant="contained" disableElevation className="button-primary" onClick={handleSignout}>Sign Out</Button>
             </>

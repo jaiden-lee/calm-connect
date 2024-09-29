@@ -15,26 +15,29 @@ import AddDaysOff from "@/components/modals/AddDaysOff";
 
 type FilterType = "All" | "Pending" | "Accepted";
 type Patient = {
-  id: string;
-  phone_number: string;
-  name: string;
-  is_new: boolean;
-  description: string;
+  id: string,
+  phone_number: string,
+  name: string,
+  is_new: boolean,
+  description: string
 };
 type Appointment = {
-  id: string;
-  created_at: Date;
-  patient_id: string;
-  name: string;
-  description: string;
-  is_new: boolean;
-  is_pending: boolean;
+  id: string,
+  created_at: Date,
+  patient_id: string,
+  name: string,
+  description: string,
+  is_new: boolean,
+  is_pending: boolean,
+  appointment_start_date: Date,
+  appointment_length_minutes: number,
+  phone_number: string
 };
 type PageProps = {
-  id: string;
-  appointments: Appointment[];
-  therapist: Tables<"therapists">;
-  error?: string;
+  id: string,
+  appointments: Appointment[],
+  therapist: Tables<"therapists">,
+  error?: string
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
@@ -77,6 +80,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         id: id,
         therapist: therapistData[0],
         appointments: [],
+        error: "Error occurred"
       },
     };
   }
@@ -85,6 +89,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       id: id,
       therapist: therapistData[0],
       appointments: appointmentsData,
+      error: "No error"
     },
   };
 }
@@ -124,6 +129,7 @@ const convertDaysOffToEvent = (daysOff: Tables<"therapists">["days_off"]) => {
 };
 
 function Dashboard(props: PageProps) {
+  console.log(props.appointments);
   const [filter, setFilter] = useState<FilterType>("All");
   const [availabilitiesAsEvent, setAvailabilitiesAsEvent] = useState(
     convertAvailabilitesToEvent(props.therapist.availabilities),
@@ -141,35 +147,51 @@ function Dashboard(props: PageProps) {
     setDaysOff(convertDaysOffToEvent(props.therapist.days_off));
   };
 
-  const [pendingEvents, setPendingEvents] = useState([
-    {
-      title: "Gerald Ford",
-      start: new Date(),
-      end: new Date(Date.now() + 3600 * 1000),
-      displayEventEnd: true,
-    },
-  ]);
-  const [acceptedEvents, setAcceptedEvents] = useState([
-    {
-      title: "Gerald Ford",
-      start: new Date(Date.now() - 24 * 3600 * 1000),
-      end: new Date(Date.now() - 23 * 3600 * 1000),
-      displayEventEnd: true,
-    },
-  ]);
+  // const [pendingEvents, setPendingEvents] = useState([
+  //   {
+  //     id: 1,
+  //     title: "Gerald Ford",
+  //     start: new Date(),
+  //     end: new Date(Date.now() + 3600 * 1000),
+  //     displayEventEnd: true,
+  //   },
+  // ]);
+  const [pendingEvents, setPendingEvents] = useState(props.appointments.filter((appointment) => appointment.is_pending).map((appointment) => ({
+    id: appointment.id,
+    title: appointment.name,
+    start: new Date(appointment.appointment_start_date),
+    end: new Date(appointment.appointment_start_date)
+      ?.setMinutes(new Date(appointment.appointment_start_date).getMinutes() + appointment.appointment_length_minutes)
+  })));
+  const [acceptedEvents, setAcceptedEvents] = useState(props.appointments.filter((appointment) => !appointment.is_pending).map((appointment) => ({
+    id: appointment.id,
+    title: appointment.name,
+    start: new Date(appointment.appointment_start_date),
+    end: new Date(appointment.appointment_start_date)
+      ?.setMinutes(new Date(appointment.appointment_start_date).getMinutes() + appointment.appointment_length_minutes)
+  })));
+  // const [acceptedEvents, setAcceptedEvents] = useState([
+  //   {
+  //     title: "Gerald Ford",
+  //     start: new Date(Date.now() - 24 * 3600 * 1000),
+  //     end: new Date(Date.now() - 23 * 3600 * 1000),
+  //     displayEventEnd: true,
+  //   },
+  // ]);
 
   const filteredAppointments = props.appointments.filter((appointment) => {
     if (filter === "Pending") {
       if (appointment.is_pending) {
-        return appointment;
+        return true;
       }
     } else if (filter === "Accepted") {
       if (!appointment.is_pending) {
-        return appointment;
+        return true;
       }
     } else {
-      return appointment;
+      return true;
     }
+    return false;
   });
   const cards = filteredAppointments.map((appointment) => {
     return (
@@ -179,6 +201,12 @@ function Dashboard(props: PageProps) {
         date={appointment.created_at}
         patientName={appointment.name}
         description={appointment.description}
+        is_pending={appointment.is_pending}
+        appointment_start_date={appointment.appointment_start_date}
+        appointment_length_minutes={appointment.appointment_length_minutes}
+        phone_number={appointment.phone_number}
+        setAcceptedEvents={setAcceptedEvents}
+        setPendingEvents={setPendingEvents}
       />
     );
   });
@@ -299,8 +327,20 @@ function Dashboard(props: PageProps) {
             </ButtonGroup>
           </div>
           {/* Main */}
-          <main className="grid justify-items-center grid-cols-[repeat(auto-fill,minmax(13rem,1fr))] gap-8 w-full h-[70vh] overflow-auto no-scrollbar pb-6">
+          <main className="grid items-start grid-cols-[repeat(auto-fill,minmax(13rem,1fr))] gap-8 w-full h-[70vh] overflow-auto no-scrollbar pb-6">
             {cards}
+            {/* <PatientCard
+              key={10}
+              id="10"
+              date={new Date()}
+              patientName={"Bob"}
+              description={"Lorem ipsum"}
+              is_pending={true}
+              appointment_start_date={new Date()}
+              appointment_length_minutes={60}
+              phone_number="+12018447267"
+            /> */}
+            
           </main>
         </div>
       </div>
