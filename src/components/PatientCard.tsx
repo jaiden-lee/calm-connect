@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/component";
 import { useNotifications } from "@toolpad/core";
 import { useState } from "react";
 import AppointmentDetails from "./modals/AppointmentDetails";
+import dayjs, { Dayjs } from "dayjs";
 
 type PatientCardProps = {
     id: string,
@@ -16,6 +17,12 @@ type PatientCardProps = {
     phone_number: string,
     setAcceptedEvents: any,
     setPendingEvents: any
+}
+
+function getEventLink(title: string, start: Dayjs, length: number ) {
+    let formatedStart = start.toISOString().replace(/-|:|\.\d\d\d/g,"");
+    let formatedEnd = start.add(length, "minutes").toISOString().replace(/-|:|\.\d\d\d/g,"");
+    return `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatedStart}/${formatedEnd}&sf=true&output=xml`
 }
 
 function formatDate(date: Date): string {
@@ -39,9 +46,9 @@ function PatientCard(props: PatientCardProps) {
     const [isDeleted, setIsDeleted] = useState(false);
 
     async function acceptAppointment() {
-        const {error} = await supabase.from("appointments").update({
+        const {data, error} = await supabase.from("appointments").update({
             is_pending: false
-        }).eq("id", props.id);
+        }).eq("id", props.id).select();
         if (error) {
             notifications.show("Error: " + error.message, {
                 severity: "error",
@@ -72,6 +79,17 @@ function PatientCard(props: PatientCardProps) {
 
             })
         });
+        console.log("sending message")
+        const {data: userData, error: userError} = await supabase.from("patient").select().eq("id", data[0]?.patient??2);
+        let eventLink = getEventLink("Therapy appointment", dayjs(data[0].appointment_start_time), data[0].appointment_length_minutes??60)
+        if (userError) {
+            notifications.show("Error: " + userError.message, {
+                severity: "error",
+                autoHideDuration: 3000,
+              });
+            return;
+        }
+        fetch(`/api/hello?phone_number=${userData[0].phone_number}&message=${encodeURI('you\'re therapy appointment has been approved, add it to your calendar: '+eventLink)}`).then(x => x.json()).then(x => console.log(x));
     }
 
     async function denyAppointment() {

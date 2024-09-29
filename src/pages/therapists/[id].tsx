@@ -66,7 +66,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     await supabase.rpc("get_appointments", {
       therapist_id: Number(id),
     });
-
+    console.log(appointmentsError)
   if (appointmentsError) {
     return {
       props: {

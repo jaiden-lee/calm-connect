@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -11,6 +11,8 @@ export type Database = {
     Tables: {
       appointments: {
         Row: {
+          appointment_length_minutes: number | null
+          appointment_start_time: string
           created_at: string
           id: number
           is_pending: boolean
@@ -18,6 +20,8 @@ export type Database = {
           therapist: number | null
         }
         Insert: {
+          appointment_length_minutes?: number | null
+          appointment_start_time: string
           created_at?: string
           id?: number
           is_pending?: boolean
@@ -25,6 +29,8 @@ export type Database = {
           therapist?: number | null
         }
         Update: {
+          appointment_length_minutes?: number | null
+          appointment_start_time?: string
           created_at?: string
           id?: number
           is_pending?: boolean
@@ -185,6 +191,9 @@ export type Database = {
           description: string
           is_new: boolean
           is_pending: boolean
+          appointment_start_date: string
+          appointment_length_minutes: number
+          phone_number: string
         }[]
       }
     }
