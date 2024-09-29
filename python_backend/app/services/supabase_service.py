@@ -2,6 +2,8 @@ import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
 import logging
+from datetime import datetime
+
 
 load_dotenv()
 
@@ -31,9 +33,27 @@ def get_all_patients(client: Client):
         print(f"Error fetching patients: {str(e)}")
         return []
 
+def make_appointment(client:Client,therapist_id: int = None, patient_id:int = None, start_time:str=None):
+    try:
+        data = {
+            'created_at': f'{datetime.now()}',
+            'patient_id': patient_id,
+            'therapist_id': therapist_id,
+            'start_time': start_time
+        }
+        response = client.table('appointments').insert(data).execute()
+        logging.info(f"Created new appointment: {response.data}")
+        return response.data[0] if response.data else None
+    except Exception as e:
+        logging.error(f"Error creating patient: {str(e)}")
+        return None
 def get_all_therapists(client: Client):
     response = client.table('therapists').select('*').execute()
     return response.data
+
+def get_therapist_by_id(client: Client, id: int):
+    response = client.table('therapists').select('*').eq("id", id).execute()
+    return response.data[0] if response.data else None
 
 def get_patient_by_phone(client: Client, phone_number: str):
     response = client.table("patient").select("*").eq("phone_number", phone_number).execute()
