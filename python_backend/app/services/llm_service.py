@@ -15,7 +15,11 @@ import os
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
 
 def store_user_and_appointment(text_json, supabase_client, from_number):
-    response =  json.loads(text_json.split('JSON')[1].strip())
+    try:
+        response =  json.loads(text_json.split('JSON')[1].strip())
+    except:
+
+        return "No valid Json"
     patient_info = response["patient_info"]
     appointment_info = response["appointment_info"]
     patient_created = create_patient(
@@ -38,7 +42,7 @@ def store_user_and_appointment(text_json, supabase_client, from_number):
             logging.info(f"Appointment id is {appt_created}")
     else:
         logging.error("Failed to create patient")
-
+    return "success"
 def get_therapist_match(from_number,supabase_client, user_message,conversation_state):
     all_therapists = get_all_therapists(supabase_client)
     
@@ -81,7 +85,7 @@ def get_therapist_match(from_number,supabase_client, user_message,conversation_s
         - Your responses should concise and to the point and professional.
         - Following this, once you have all the message, return it in a JSON format and say "JSON" at the beginning of the message so the frontend of the application can parse it.
        
-        Follow ALL of these instructions and have a conversation with the patient.
+        Follow ALL of these instructions and have a conversation with the patient. Make sure you arrive at a confirmed appointment date by the end.
         
         You are an AI SMS-based therapy scheduling assistant designed to provide users with a seamless and supportive experience while booking appointments with therapists. Your primary goal is to help users identify their needs and preferences for therapy, guiding them through the scheduling process in a friendly and empathetic manner.
         Key Responsibilities:
@@ -96,10 +100,13 @@ def get_therapist_match(from_number,supabase_client, user_message,conversation_s
         Availability for appointments (days of the week, times of day).
         Providing Options: Based on the information gathered, present users with suitable therapist options and available appointment times. Be sure to highlight any relevant qualifications or specialties of the therapists.
 
-        You can offer a therapist as an option to the user. Try to find way that the therapist in our system matches the user's therapy needs. 
+        Based on the therapist info and the user details, match a therapist to the patient that best fits the user's therapy needs. 
+
+        Once a therapist has been selected, ask them an appointment time slot that fit in both patient and therapist schedules. If they don't agree, keep prompting and if they do, begin the confirmation process. The time slot NEEDS to be a specific time for you to begin your confirmation message.
 
         Confirmation Process: Once the user has selected a therapist and an appointment time, confirm the details with them. Ask if they need any additional information or support regarding the session.
 
+ 
         Supportive Closure: After confirming the appointment, provide a warm and supportive message, reminding the user that seeking help is a positive step. Reassure them that they can reach out for further assistance if needed.
 
         Ending the Conversation: Once the appointment is successfully booked and confirmed, conclude the interaction by stating "JSON" followed by a valid json in this formate
@@ -185,7 +192,12 @@ def get_therapist_match(from_number,supabase_client, user_message,conversation_s
             "content": f"{assistant_response}"
         })
         if "JSON" in assistant_response:
-            store_user_and_appointment(assistant_response,supabase_client, from_number)
+            response = store_user_and_appointment(assistant_response,supabase_client, from_number)
+            if response == "success":
+                conversation_state['current_step'] = 'complete'
+                session[from_number] = conversation_state
+                session.modified = True
+
             
     return
 

@@ -33,6 +33,7 @@ def get_all_patients(client: Client):
 
 def make_appointment(client:Client,therapist_id: int = None, patient_id:int = None, start_time:str=None, duration:str=None):
     try:
+        existing_appointment = client.table('appointments').select('*').eq("patient", patient_id).eq("therapist", therapist_id).eq('appointment_start_time',start_time).execute()
         print(f"\n\ntrying to create an appt")
         data = {
             'created_at': f'{datetime.now()}',
@@ -61,6 +62,11 @@ def get_patient_by_phone(client: Client, phone_number: str):
 
 def create_patient(client: Client, phone_number: str, name: str = None, description: str = None, therapist_id: int = None):
     try:
+        existing_patient = client.table('patient').select('*').eq('phone_number', phone_number).execute()
+        if existing_patient.data:
+            logging.info(f"Patient with phone number {phone_number} already exists")
+            return existing_patient.data[0]
+
         print(f"\n\n\ntrying to create a new patient")
         data = {
             'phone_number': phone_number,
