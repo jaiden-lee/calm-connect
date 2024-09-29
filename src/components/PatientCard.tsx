@@ -20,8 +20,8 @@ type PatientCardProps = {
 }
 
 function getEventLink(title: string, start: Dayjs, length: number ) {
-    let formatedStart = start.toISOString().replace(/-|:|\.\d\d\d/g,"");
-    let formatedEnd = start.add(length, "minutes").toISOString().replace(/-|:|\.\d\d\d/g,"");
+    const formatedStart = start.toISOString().replace(/-|:|\.\d\d\d/g,"");
+    const formatedEnd = start.add(length, "minutes").toISOString().replace(/-|:|\.\d\d\d/g,"");
     return `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatedStart}/${formatedEnd}&sf=true&output=xml`
 }
 
@@ -81,7 +81,7 @@ function PatientCard(props: PatientCardProps) {
         });
         console.log("sending message")
         const {data: userData, error: userError} = await supabase.from("patient").select().eq("id", data[0]?.patient??2);
-        let eventLink = getEventLink("Therapy appointment", dayjs(data[0].appointment_start_time), data[0].appointment_length_minutes??60)
+        const eventLink = getEventLink("Therapy appointment", dayjs(data[0].appointment_start_time), data[0].appointment_length_minutes??60)
         if (userError) {
             notifications.show("Error: " + userError.message, {
                 severity: "error",
